@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>轮班查询器</title>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<h1>轮班查询器</h1>
+	<p>请输入您要查询的日期:</p>
+	<input type="date" id="input-date">
+	<button onclick="checkShift()">查询</button>
+	<p id="shift-result"></p>
+	<p id="shift-before"></p>
+	<p id="shift-after"></p>
+	<p id="day-of-week"></p>
+
+	<script>
+		function checkShift() {
+			// 获取输入日期
+			var inputDate = new Date(document.getElementById("input-date").value);
+
+			// 计算与基准日期的天数差
+			var baseDate = new Date("2023-02-23"); // 第一个晚班的日期
+			var dayDiff = (inputDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24);
+
+			// 根据天数差计算轮班
+			var shift;
+			var daysPerCycle = 8; // 每轮天数
+			var remainder = (dayDiff % daysPerCycle + daysPerCycle) % daysPerCycle; // 取余，保证余数为正数
+			if (remainder == 0 || remainder == 1) {
+				shift = "晚班";
+			} else if (remainder == 2 || remainder == 3) {
+				shift = "早班";
+			} else if (remainder == 4 || remainder == 5) {
+				shift = "中班";
+			} else {
+				shift = "休息";
+			}
+
+			// 显示结果
+			var result = document.getElementById("shift-result");
+			result.innerHTML = inputDate.toLocaleDateString() + "是" + shift;
+
+			// 显示输入日期前一天的班次
+			var beforeDate = new Date(inputDate.getTime() - 24 * 60 * 60 * 1000); // 前一天日期对象
+			var beforeDiff = (beforeDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24); // 前一天与基准日期的天数差
+			var beforeShift = calculateShift(beforeDiff); // 前一天的班次
+			var beforeResult = document.getElementById("shift-before");
+			beforeResult.innerHTML = beforeDate.toLocaleDateString() + "是" + beforeShift;
+
+			// 显示输入日期后一天的班次
+			var afterDate = new Date(inputDate.getTime() + 24 * 60 * 60 * 1000); // 后一天日期对象
+			var afterDiff = (afterDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24); // 后一天与基准日期的天数差
+			var afterShift = calculateShift(afterDiff); // 后一天的班次
+			var afterResult = document.getElementById("shift-after");
+			afterResult.innerHTML = afterDate.toLocaleDateString() + "是" + afterShift;
+
+			// 显示输入日期的星期
+			var dayOfWeek = inputDate.getDay();
+			var weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+			var dayOfWeekResult = document.getElementById("day-of-week");
+			dayOfWeekResult.innerHTML = inputDate.toLocaleDateString() + "是" + weekDays[dayOfWeek];
+		}
+		
+			// 根据天数差计算班次
+	function calculateShift(dayDiff) {
+		var shift;
+		var daysPerCycle = 8; // 每轮天数
+		var remainder = (dayDiff % daysPerCycle + daysPerCycle) % daysPerCycle; // 取余，保证余数为正数
+		if (remainder == 0 || remainder == 1) {
+			shift = "晚班";
+		} else if (remainder == 2 || remainder == 3) {
+			shift = "早班";
+		} else if (remainder == 4 || remainder == 5) {
+			shift = "中班";
+		} else {
+			shift = "休息";
+		}
+		return shift;
+	}
+</script>
+</body>
+</html>
